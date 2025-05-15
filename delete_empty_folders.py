@@ -1,4 +1,3 @@
-from send2trash import send2trash
 import datetime
 import os
 import pathlib
@@ -6,6 +5,8 @@ import socket
 import sys
 import time
 import typing
+
+from send2trash import send2trash
 
 import logging
 logger = logging.getLogger()
@@ -84,12 +85,12 @@ def main():
 
 def setup_logging(
         logger: logging.Logger,
-        log_file_path: typing.Union[str, os.fspath],
+        log_file_path: typing.Union[str, os.PathLike[str]],
         number_of_logs_to_keep: typing.Union[int, None] = None,
-        console_logging_level=logging.DEBUG,
-        file_logging_level=logging.DEBUG,
-        log_message_format='%(asctime)s.%(msecs)03d %(levelname)s [%(funcName)s]: %(message)s',
-        date_format='%Y-%m-%d %H:%M:%S'):
+        console_logging_level: int = logging.DEBUG,
+        file_logging_level: int = logging.DEBUG,
+        log_message_format: str = '%(asctime)s.%(msecs)03d %(levelname)s [%(funcName)s] [%(name)s]: %(message)s',
+        date_format: str = '%Y-%m-%d %H:%M:%S') -> None:
     # Initialize logs folder
     log_dir = os.path.dirname(log_file_path)
     if not os.path.exists(log_dir):
