@@ -69,16 +69,17 @@ def main():
         for dir_name in dirs:
             dir_path = os.path.join(root, dir_name)
             logger.debug(f"Scanning '{dir_path}'")
+            if path_is_ignored(dir_path, ignore_these_exact_paths, any_part_of_path_to_ignore):
+                continue
             if dir_is_empty(dir_path):
-                if path_is_ignored(dir_path, ignore_these_exact_paths, any_part_of_path_to_ignore):
-                    continue
-                try:
-                    send2trash(dir_path)
-                    deleted_dirs += 1
-                    logger.info(f"Deleted '{dir_path}'")
-                except Exception as e:
-                    logger.error(f"Failed to delete '{dir_path}': {e}")
-                    logger.error(traceback.format_exc())
+                continue
+            try:
+                send2trash(dir_path)
+                deleted_dirs += 1
+                logger.info(f"Deleted '{dir_path}'")
+            except Exception as e:
+                logger.error(f"Failed to delete '{dir_path}': {e}")
+                logger.error(traceback.format_exc())
 
     logger.debug(f"Deleted {deleted_dirs} dir(s).")
 
