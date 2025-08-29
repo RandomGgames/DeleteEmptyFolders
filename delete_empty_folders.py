@@ -65,7 +65,7 @@ def main():
     logger.info(f"Deleting empty dirs in '{path_to_scan}'...")
 
     deleted_dirs = 0
-    for root, dirs, _ in os.walk(os.path.dirname(os.path.realpath(path_to_scan)), topdown=False):
+    for root, dirs, _ in os.walk(path_to_scan, topdown=False):
         for dir_name in dirs:
             dir_path = os.path.join(root, dir_name)
             logger.debug(f"Scanning '{dir_path}'")
