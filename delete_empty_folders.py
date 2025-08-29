@@ -58,11 +58,11 @@ def dir_is_empty(directory) -> bool:
 
 def main():
     config = load_config()
-    path_to_scan = str(config["path_to_scan"])
+    path_to_scan = os.path.realpath(str(config["path_to_scan"]))
     ignore_these_exact_paths = list(config["ignore_these_exact_paths"])
     any_part_of_path_to_ignore = list(config["any_part_of_path_to_ignore"])
 
-    logger.info("Deleting empty dirs...")
+    logger.info(f"Deleting empty dirs in '{path_to_scan}'...")
 
     deleted_dirs = 0
     for root, dirs, _ in os.walk(os.path.dirname(os.path.realpath(path_to_scan)), topdown=False):
