@@ -71,7 +71,7 @@ def main():
             logger.debug(f"Scanning '{dir_path}'")
             if path_is_ignored(dir_path, ignore_these_exact_paths, any_part_of_path_to_ignore):
                 continue
-            if dir_is_empty(dir_path):
+            if not dir_is_empty(dir_path):
                 continue
             try:
                 send2trash(dir_path)
