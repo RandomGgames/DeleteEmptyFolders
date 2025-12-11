@@ -18,7 +18,7 @@ Delete Empty Folders
 Deletes empty folders in the specified directory tree.
 """
 
-__version__ = "1.1.2"  # Major.Minor.Patch
+__version__ = "1.1.3"  # Major.Minor.Patch
 
 
 def read_toml(file_path: typing.Union[str, pathlib.Path]) -> dict:
@@ -56,30 +56,39 @@ def dir_is_empty(path) -> bool:
 
 
 def main():
-    path_to_scan = os.path.realpath(str(config["path_to_scan"]))
+    paths_to_scan = [os.path.abspath(os.path.join(os.getcwd(), path)) for path in config["paths_to_scan"]]
+    logger.debug(f"{paths_to_scan=}")
     ignore_these_exact_paths = list(config["ignore_these_exact_paths"])
+    logger.debug(f"{ignore_these_exact_paths=}")
     any_part_of_path_to_ignore = list(config["any_part_of_path_to_ignore"])
+    logger.debug(f"{any_part_of_path_to_ignore=}")
 
-    logger.info(f"Deleting empty dirs in '{path_to_scan}'...")
+    deleted_dirs_count = 0
+    deleted_dirs_list = []
+    for path_to_scan in paths_to_scan:
+        logger.info(f"Deleting empty dirs in '{path_to_scan}'...")
 
-    deleted_dirs = 0
-    for root, dirs, _ in os.walk(path_to_scan, topdown=False):
-        for dir_name in dirs:
-            dir_path = os.path.join(root, dir_name)
-            logger.debug(f"Scanning '{dir_path}'")
-            if path_is_ignored(dir_path, ignore_these_exact_paths, any_part_of_path_to_ignore):
-                continue
-            if not dir_is_empty(dir_path):
-                continue
-            try:
-                send2trash(dir_path)
-                deleted_dirs += 1
-                logger.info(f"Deleted '{dir_path}'")
-            except Exception as e:
-                logger.error(f"Failed to delete '{dir_path}': {e}")
-                logger.error(traceback.format_exc())
+        for root, dirs, _ in os.walk(path_to_scan, topdown=False):
+            for dir_name in dirs:
+                dir_path = os.path.join(root, dir_name)
+                logger.debug(f"Scanning '{dir_path}'")
+                if path_is_ignored(dir_path, ignore_these_exact_paths, any_part_of_path_to_ignore):
+                    continue
+                if not dir_is_empty(dir_path):
+                    continue
+                try:
+                    send2trash(dir_path)
+                    deleted_dirs_count += 1
+                    deleted_dirs_list.append(dir_path)
+                    logger.info(f"Deleted '{dir_path}'")
+                except Exception as e:
+                    logger.error(f"Failed to delete '{dir_path}': {e}")
+                    logger.error(traceback.format_exc())
 
-    logger.debug(f"Deleted {deleted_dirs} dir(s).")
+    logger.debug(f"Deleted {deleted_dirs_count} dir(s).")
+    logger.debug("Deleted dirs:")
+    for deleted_dir in deleted_dirs_list:
+        logger.debug(f" - {deleted_dir}")
 
 
 def format_duration_long(duration_seconds: float) -> str:
